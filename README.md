@@ -48,8 +48,6 @@ API Key 在每次调用时解析，优先级从高到低：
 - 中文：https://api-docs.deepseek.com/zh-cn/guides/search
 - English：https://api-docs.deepseek.com/guides/search
 
-扩展侧只多一个参数：`fetch` 的 `maxChars`（默认 `40000`，限制返回的 Markdown 字符数）。
-
 ## 行为说明
 
 - 对 `408 / 429 / 5xx` 自动重试，指数退避，最多 3 次，并支持工具级取消（abort）。

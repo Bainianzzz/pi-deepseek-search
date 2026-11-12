@@ -68,7 +68,6 @@ interface FetchDetails {
 	url: string;
 	title: string;
 	contentChars: number;
-	truncated: boolean;
 	error?: string;
 }
 
@@ -405,13 +404,6 @@ export default function deepseekSearch(pi: ExtensionAPI) {
 		],
 		parameters: Type.Object({
 			url: Type.String({ description: "Absolute http(s) URL to fetch (max 8192 chars)" }),
-			maxChars: Type.Optional(
-				Type.Integer({
-					minimum: 1000,
-					maximum: 200000,
-					description: "Maximum characters of Markdown content returned (default 40000)",
-				}),
-			),
 		}),
 
 		async execute(_toolCallId, params, signal): Promise<{ content: { type: "text"; text: string }[]; details: Details; isError?: boolean }> {
@@ -425,7 +417,7 @@ export default function deepseekSearch(pi: ExtensionAPI) {
 			if (!parsed || (parsed.protocol !== "http:" && parsed.protocol !== "https:")) {
 				return {
 					content: [{ type: "text", text: `fetch requires an absolute http(s) URL, got: ${url || "(empty)"}` }],
-					details: { kind: "fetch", url, title: "", contentChars: 0, truncated: false, error: "invalid url" },
+					details: { kind: "fetch", url, title: "", contentChars: 0, error: "invalid url" },
 					isError: true,
 				};
 			}
@@ -434,18 +426,15 @@ export default function deepseekSearch(pi: ExtensionAPI) {
 				const data = await callApi<{ title?: string; content?: string }>("fetch", { url }, signal);
 				const title = data.title ?? "";
 				const content = data.content ?? "";
-				const cap = params.maxChars ?? 40000;
-				const clipped = truncate(content, cap);
 
 				const header = [`# ${title || url}`, `Source: ${url}`, ""].join("\n");
 				return {
-					content: [{ type: "text", text: header + clipped.text }],
+					content: [{ type: "text", text: header + content }],
 					details: {
 						kind: "fetch",
 						url,
 						title,
 						contentChars: content.length,
-						truncated: clipped.truncated,
 					},
 				};
 			} catch (error) {
@@ -457,7 +446,6 @@ export default function deepseekSearch(pi: ExtensionAPI) {
 						url,
 						title: "",
 						contentChars: 0,
-						truncated: false,
 						error: message,
 					},
 					isError: true,
@@ -480,7 +468,6 @@ export default function deepseekSearch(pi: ExtensionAPI) {
 			}
 			let line = theme.fg("success", `✓ ${details?.title || details?.url || "fetched"}`);
 			line += theme.fg("dim", `  ${details?.contentChars ?? 0} chars`);
-			if (details?.truncated) line += theme.fg("warning", " (truncated)");
 			if (expanded) line += `\n${theme.fg("dim", details?.url ?? "")}`;
 			text.setText(line);
 			return text;

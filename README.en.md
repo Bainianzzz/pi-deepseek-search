@@ -49,8 +49,6 @@ Parameters, search operators, response fields and error codes for `search` and `
 - English: https://api-docs.deepseek.com/guides/search
 - 中文: https://api-docs.deepseek.com/zh-cn/guides/search
 
-The extension only adds one parameter: `maxChars` on `fetch` (default `40000`, caps the returned Markdown).
-
 ## Behaviour notes
 
 - Retries on `408 / 429 / 5xx` with exponential backoff (3 attempts), abortable via the tool signal.
