@@ -12,10 +12,10 @@
  *   2. DEEPSEEK_API_KEY
  *   3. apiKey of a provider in <agent-dir>/models.json whose baseUrl host ends with deepseek.com
  *
- * Base URL resolution:
- *   1. DEEPSEEK_SEARCH_BASE_URL (origin only, e.g. https://api.deepseek.com)
- *   2. origin of the matching provider baseUrl in models.json
- *   3. https://api.deepseek.com
+ * Base URL: fixed to the official endpoint documented at
+ * https://api-docs.deepseek.com/zh-cn/guides/search
+ *   search: https://api.deepseek.com/v1/tools/search
+ *   fetch:  https://api.deepseek.com/v1/tools/fetch
  */
 
 import { readFileSync } from "node:fs";
@@ -25,12 +25,11 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
 
-const DEFAULT_ORIGIN = "https://api.deepseek.com";
+const API_BASE_URL = "https://api.deepseek.com/v1/tools";
 const RETRYABLE = new Set([408, 429, 500, 502, 503, 504]);
 
 interface Config {
 	apiKey: string;
-	origin: string;
 }
 
 interface SearchResult {
@@ -79,7 +78,7 @@ function agentDir(): string {
 	return process.env.PI_CODING_AGENT_DIR || join(homedir(), ".pi", "agent");
 }
 
-function readProviderConfig(): { apiKey?: string; origin?: string } {
+function readProviderConfig(): { apiKey?: string } {
 	for (const dir of [agentDir(), join(process.cwd(), ".pi")]) {
 		let raw: string;
 		try {
@@ -97,7 +96,7 @@ function readProviderConfig(): { apiKey?: string; origin?: string } {
 		if (!providers || typeof providers !== "object") continue;
 
 		for (const [id, value] of Object.entries(providers)) {
-			const provider = value as { baseUrl?: unknown; apiKey?: unknown; name?: unknown };
+			const provider = value as { baseUrl?: unknown; apiKey?: unknown };
 			const baseUrl = typeof provider.baseUrl === "string" ? provider.baseUrl : "";
 			let host = "";
 			try {
@@ -107,11 +106,9 @@ function readProviderConfig(): { apiKey?: string; origin?: string } {
 			}
 			const looksDeepSeek = host.endsWith("deepseek.com") || /deepseek/i.test(id);
 			if (!looksDeepSeek) continue;
-			if (!host.endsWith("deepseek.com")) continue;
 
-			const origin = new URL(baseUrl).origin;
 			const apiKey = typeof provider.apiKey === "string" ? provider.apiKey : undefined;
-			return { apiKey, origin };
+			return { apiKey };
 		}
 	}
 	return {};
@@ -135,11 +132,7 @@ function resolveConfig(): Config {
 		);
 	}
 
-	const envOrigin = process.env.DEEPSEEK_SEARCH_BASE_URL?.trim();
-	return {
-		apiKey,
-		origin: (envOrigin || fromModels.origin || DEFAULT_ORIGIN).replace(/\/+$/, ""),
-	};
+	return { apiKey };
 }
 
 function sleep(ms: number, signal?: AbortSignal): Promise<void> {
@@ -186,8 +179,8 @@ async function callApi<T>(
 	body: Record<string, unknown>,
 	signal?: AbortSignal,
 ): Promise<T> {
-	const { apiKey, origin } = resolveConfig();
-	const url = `${origin}/v1/tools/${endpoint}`;
+	const { apiKey } = resolveConfig();
+	const url = `${API_BASE_URL}/${endpoint}`;
 	const maxAttempts = 3;
 	let lastError: unknown;
 

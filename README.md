@@ -1,98 +1,81 @@
 # pi-deepseek-search
 
-A [Pi](https://pi.dev) extension that adds two web tools powered by the
-[DeepSeek Search / Fetch API](https://api-docs.deepseek.com/zh-cn/guides/search):
+**中文** | [English](./README.en.md)
 
-- **`search`** — query the live web, returns ranked results (title / url / site / date / summary), with optional full page content.
-- **`fetch`** — fetch a single URL and return its title plus main content as Markdown.
+一个 [Pi](https://pi.dev) 扩展，基于 [DeepSeek Search / Fetch API](https://api-docs.deepseek.com/zh-cn/guides/search) 提供两个联网工具：
 
-Both tools ship with a custom TUI renderer (compact result list, `ctrl+o` to expand).
+- **`search`** —— 联网搜索，返回排序后的结果（标题 / 链接 / 站点 / 日期 / 摘要），可选返回网页正文。
+- **`fetch`** —— 抓取单个 URL，返回标题和正文的 Markdown。
 
-## Install
+两个工具都带自定义 TUI 渲染（紧凑结果列表，`ctrl+o` 展开详情）。
+
+## 安装
 
 ```bash
-# from GitHub (git source)
+# 从 GitHub 安装（git 源）
 pi install git:github.com/Bainianzzz/pi-deepseek-search
 
-# or from npm
+# 或从 npm 安装
 pi install npm:pi-deepseek-search
 
-# try it for a single run without installing
+# 只试用一次，不写入配置
 pi -e git:github.com/Bainianzzz/pi-deepseek-search
 ```
 
-Then restart Pi (or run `/reload`).
+安装后重启 Pi，或执行 `/reload`。
 
-## Configure
+## 配置
 
-The API key is resolved on every call, first match wins:
+API Key 在每次调用时解析，优先级从高到低：
 
 1. `DEEPSEEK_SEARCH_API_KEY`
-2. `DEEPSEEK_API_KEY`
-3. the `apiKey` of any provider in `<agent-dir>/models.json` whose `baseUrl` host ends with `deepseek.com`
+2. `DEEPSEEK_API_KEY`（已配好 DeepSeek 模型 provider 时无需任何额外配置）
+3. `models.json` 中任意 `baseUrl` 域名以 `deepseek.com` 结尾的 provider 的 `apiKey`
 
-The base URL is resolved as:
+请求地址固定走官方 Endpoint，不可配置：
 
-1. `DEEPSEEK_SEARCH_BASE_URL` (origin only, e.g. `https://api.deepseek.com`)
-2. the origin of the matching provider `baseUrl` in `models.json`
-3. `https://api.deepseek.com`
+| 工具 | URL |
+|---|---|
+| `search` | `POST https://api.deepseek.com/v1/tools/search` |
+| `fetch` | `POST https://api.deepseek.com/v1/tools/fetch` |
 
-So if you already configured DeepSeek as a model provider, no extra setup is needed:
+> `models.json` 会从 `$PI_CODING_AGENT_DIR`（默认 `~/.pi/agent`）和当前目录下的 `./.pi/models.json` 读取。
 
-```bash
-export DEEPSEEK_API_KEY=sk-...
-pi
-```
+## 工具说明
 
-> `models.json` is read from `$PI_CODING_AGENT_DIR` (default `~/.pi/agent`) and from `./.pi/models.json`.
+`search` 和 `fetch` 的参数、搜索语法、返回字段与错误码，见官方文档：
 
-## Tools
+- 中文：https://api-docs.deepseek.com/zh-cn/guides/search
+- English：https://api-docs.deepseek.com/guides/search
 
-### `search`
+扩展侧只多一个参数：`fetch` 的 `maxChars`（默认 `40000`，限制返回的 Markdown 字符数）。
 
-| parameter | type | description |
-|---|---|---|
-| `query` | string (required) | 1–128 chars. Supports operators: `site:`, `-site:`, `-keyword`, `-"phrase"`, `"phrase"`, `lang:zh,en`, `after:2025-01-01`, `before:2026` |
-| `count` | integer 1–50 | number of results (default `10`) |
-| `needContent` | boolean | also return page body text (default `false`) |
-| `oriQuestion` | string | the user's original question, helps the engine understand intent |
+## 行为说明
 
-Output is a ranked list with `title`, `url`, `site · date · score · authority`, an LLM summary, and — if `needContent` is set — truncated page content (8k chars per result, 60k total; the rest is dropped in favour of `fetch`).
+- 对 `408 / 429 / 5xx` 自动重试，指数退避，最多 3 次，并支持工具级取消（abort）。
+- HTTP 错误会映射为可读信息（`402 余额不足`、`403 被安全策略拒绝抓取` 等）。
+- 每次调用都会重新读取 API Key，修改环境变量或 `models.json` 后无需重启。
+- 请求地址固定为官方 Endpoint（`https://api.deepseek.com/v1/tools/{search,fetch}`），不提供 base URL 覆盖。
 
-### `fetch`
-
-| parameter | type | description |
-|---|---|---|
-| `url` | string (required) | absolute `http(s)` URL, max 8192 chars |
-| `maxChars` | integer 1000–200000 | max characters of Markdown returned (default `40000`) |
-
-`fetch` cannot reach `localhost`, private hosts, or non-HTML resources.
-
-## Behaviour notes
-
-- Retries on `408 / 429 / 5xx` with exponential backoff (3 attempts), abortable via the tool signal.
-- HTTP errors are mapped to readable messages (`402 insufficient balance`, `403 fetch rejected by security policy`, …).
-- Config is re-read per call, so changing env vars or `models.json` does not require a reload.
-
-## Package layout
+## 目录结构
 
 ```
 pi-deepseek-search/
-├── extensions/deepseek-search.ts   # the extension
+├── extensions/deepseek-search.ts   # 扩展本体
 ├── package.json                    # pi manifest + peerDependencies
 ├── tsconfig.json
 └── LICENSE
 ```
 
-Host-provided packages (`@earendil-works/pi-*`, `typebox`) are declared as `peerDependencies` with `"*"`, per the Pi packaging rules.
+host 提供的包（`@earendil-works/pi-*`、`typebox`）按 Pi 打包规则声明为 `peerDependencies: "*"`，不放进 `dependencies`。
 
-## Development
+## 开发
 
 ```bash
 npm install
 npm run typecheck
 ```
 
-## License
+## 许可证
 
 MIT
