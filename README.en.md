@@ -15,12 +15,6 @@ Both tools ship with a custom TUI renderer (compact result list, `ctrl+o` to exp
 ```bash
 # from GitHub (git source)
 pi install git:github.com/Bainianzzz/pi-deepseek-search
-
-# or from npm
-pi install npm:pi-deepseek-search
-
-# try it for a single run without installing
-pi -e git:github.com/Bainianzzz/pi-deepseek-search
 ```
 
 Then restart Pi (or run `/reload`).

@@ -14,12 +14,6 @@
 ```bash
 # 从 GitHub 安装（git 源）
 pi install git:github.com/Bainianzzz/pi-deepseek-search
-
-# 或从 npm 安装
-pi install npm:pi-deepseek-search
-
-# 只试用一次，不写入配置
-pi -e git:github.com/Bainianzzz/pi-deepseek-search
 ```
 
 安装后重启 Pi，或执行 `/reload`。
