@@ -1,6 +1,6 @@
 {
-  "name": "pi-ds-search",
-  "version": "0.1.0",
+  "name": "@bainianzzz/pi-deepseek-search",
+  "version": "0.1.1",
   "description": "Pi extension that adds DeepSeek-backed web search and fetch tools",
   "license": "MIT",
   "homepage": "https://github.com/Bainianzzz/pi-deepseek-search",
@@ -46,5 +46,8 @@
     "@types/node": "^22.10.2",
     "typebox": "^1.3.27",
     "typescript": "^5.9.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

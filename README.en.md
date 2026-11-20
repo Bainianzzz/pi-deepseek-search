@@ -1,4 +1,4 @@
-# pi-ds-search
+# pi-deepseek-search
 
 [中文](./README.md) | **English**
 
@@ -13,7 +13,7 @@ Both tools ship with a custom TUI renderer (compact result list, `ctrl+o` to exp
 ## Install
 
 ```bash
-pi install npm:pi-ds-search
+pi install npm:@bainianzzz/pi-deepseek-search
 ```
 
 Or install from GitHub (git source):
@@ -58,7 +58,7 @@ Parameters, search operators, response fields and error codes for `search` and `
 ## Package layout
 
 ```
-pi-ds-search/
+pi-deepseek-search/
 ├── extensions/
 │   ├── index.ts             # the extension (registers search / fetch)
 │   ├── utils.ts             # API calls and result formatting
