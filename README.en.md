@@ -59,7 +59,7 @@ Parameters, search operators, response fields and error codes for `search` and `
 
 ```
 pi-ds-search/
-├── extensions/deepseek-search.ts   # the extension
+├── extensions/index.ts             # the extension
 ├── package.json                    # pi manifest + peerDependencies
 ├── tsconfig.json
 └── LICENSE
