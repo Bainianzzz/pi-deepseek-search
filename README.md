@@ -58,8 +58,12 @@ API Key 在每次调用时解析，优先级从高到低：
 
 ```
 pi-ds-search/
-├── extensions/index.ts             # 扩展本体
-├── package.json                    # pi manifest + peerDependencies
+├── extensions/
+│   ├── index.ts             # 扩展本体（注册 search / fetch 工具）
+│   ├── utils.ts             # API 调用、结果格式化
+│   ├── render.ts            # TUI 渲染组件
+│   └── types.ts             # 共享类型（无本地依赖）
+├── package.json             # pi manifest + peerDependencies
 ├── tsconfig.json
 └── LICENSE
 ```

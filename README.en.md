@@ -59,8 +59,12 @@ Parameters, search operators, response fields and error codes for `search` and `
 
 ```
 pi-ds-search/
-├── extensions/index.ts             # the extension
-├── package.json                    # pi manifest + peerDependencies
+├── extensions/
+│   ├── index.ts             # the extension (registers search / fetch)
+│   ├── utils.ts             # API calls and result formatting
+│   ├── render.ts            # TUI renderers
+│   └── types.ts             # shared types (no local imports)
+├── package.json             # pi manifest + peerDependencies
 ├── tsconfig.json
 └── LICENSE
 ```
