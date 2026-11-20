@@ -1,4 +1,4 @@
-# pi-deepseek-search
+# pi-ds-search
 
 **中文** | [English](./README.en.md)
 
@@ -12,7 +12,12 @@
 ## 安装
 
 ```bash
-# 从 GitHub 安装（git 源）
+pi install npm:pi-ds-search
+```
+
+也可以从 GitHub 安装（git 源）：
+
+```bash
 pi install git:github.com/Bainianzzz/pi-deepseek-search
 ```
 
@@ -52,7 +57,7 @@ API Key 在每次调用时解析，优先级从高到低：
 ## 目录结构
 
 ```
-pi-deepseek-search/
+pi-ds-search/
 ├── extensions/deepseek-search.ts   # 扩展本体
 ├── package.json                    # pi manifest + peerDependencies
 ├── tsconfig.json

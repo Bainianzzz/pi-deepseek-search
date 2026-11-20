@@ -1,5 +1,5 @@
 {
-  "name": "pi-deepseek-search",
+  "name": "pi-ds-search",
   "version": "0.1.0",
   "description": "Pi extension that adds DeepSeek-backed web search and fetch tools",
   "license": "MIT",
@@ -16,6 +16,7 @@
     "pi-extension",
     "pi",
     "deepseek",
+    "ds-search",
     "web-search",
     "fetch",
     "agent"
