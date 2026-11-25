@@ -55,6 +55,16 @@ Parameters, search operators, response fields and error codes for `search` and `
 - The API key is re-read on every call, so changing env vars or `models.json` does not require a reload.
 - Request URLs are pinned to the official endpoints (`https://api.deepseek.com/v1/tools/{search,fetch}`); there is no base URL override.
 
+### Known limitation: `fetch` returns 404 for some overseas / anti-bot sites
+
+`fetch` runs server-side at DeepSeek, and often fails for overseas or anti-bot sites with one and the same payload:
+
+```json
+{ "error": { "message": "failed to fetch URL", "type": "not_found_error" } }   // HTTP 404
+```
+
+This is the service's verdict, not a bug in this extension: 404 is a catch-all — a missing page, a site refusing access, an unsupported content type and a page with no extractable body all return the identical `failed to fetch URL`, and nothing tells you which.
+
 ## Package layout
 
 ```

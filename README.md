@@ -54,6 +54,16 @@ API Key 在每次调用时解析，优先级从高到低：
 - 每次调用都会重新读取 API Key，修改环境变量或 `models.json` 后无需重启。
 - 请求地址固定为官方 Endpoint（`https://api.deepseek.com/v1/tools/{search,fetch}`），不提供 base URL 覆盖。
 
+### 已知限制：`fetch` 抓取部分境外/反爬站点返回 404
+
+`fetch` 的抓取由 DeepSeek 服务端完成，对境外站点和反爬站点经常失败，返回同一个报文：
+
+```json
+{ "error": { "message": "failed to fetch URL", "type": "not_found_error" } }   // HTTP 404
+```
+
+这是服务端的判定，不是本扩展的问题：404 是一个兜底码，页面不存在、站点拒绝访问、内容类型不支持、正文提取为空都返回同一句 `failed to fetch URL`，无法区分。
+
 ## 目录结构
 
 ```
