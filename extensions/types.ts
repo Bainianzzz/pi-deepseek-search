@@ -1,5 +1,5 @@
 /**
- * Shared types for the DeepSeek Search / Fetch extension.
+ * Shared types for the DeepSeek Search extension.
  *
  * This module has no local imports and only type-level exports, so it can be
  * imported from anywhere without creating an import cycle.
@@ -42,17 +42,9 @@ export interface SearchDetails {
 	error?: string;
 }
 
-export interface FetchDetails {
-	kind: "fetch";
-	url: string;
-	title: string;
-	contentChars: number;
-	error?: string;
-}
+export type Details = SearchDetails;
 
-export type Details = SearchDetails | FetchDetails;
-
-/** Shape returned by both tool `execute` implementations. */
+/** Shape returned by the tool `execute` implementation. */
 export interface ToolResult {
 	content: { type: "text"; text: string }[];
 	details: Details;

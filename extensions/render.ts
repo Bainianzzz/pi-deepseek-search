@@ -1,5 +1,5 @@
 /**
- * TUI renderers for the search / fetch tools.
+ * TUI renderers for the search tool.
  *
  * `renderCall` / `renderResult` are re-run on every redraw (streaming, expand /
  * collapse), so each renderer mutates the component from `context.lastComponent`
@@ -8,7 +8,7 @@
 
 import type { Theme } from "@earendil-works/pi-coding-agent";
 import { Text } from "@earendil-works/pi-tui";
-import type { FetchDetails, RenderContext, SearchDetails } from "./types.ts";
+import type { RenderContext, SearchDetails } from "./types.ts";
 import { formatDate } from "./utils.ts";
 
 function reuseText(context: RenderContext | undefined): Text {
@@ -51,30 +51,6 @@ export function renderSearchResult(
 	if (!expanded && count > shown.length) {
 		line += `\n  ${theme.fg("dim", `… ${count - shown.length} more`)}`;
 	}
-	text.setText(line);
-	return text;
-}
-
-export function renderFetchCall(args: { url?: string }, theme: Theme, context?: RenderContext): Text {
-	const text = reuseText(context);
-	text.setText(theme.fg("toolTitle", theme.bold("fetch ")) + theme.fg("accent", args.url ?? ""));
-	return text;
-}
-
-export function renderFetchResult(
-	details: FetchDetails | undefined,
-	expanded: boolean,
-	theme: Theme,
-	context?: RenderContext,
-): Text {
-	const text = reuseText(context);
-	if (details?.error) {
-		text.setText(theme.fg("error", `✗ ${details.error}`));
-		return text;
-	}
-	let line = theme.fg("success", `✓ ${details?.title || details?.url || "fetched"}`);
-	line += theme.fg("dim", `  ${details?.contentChars ?? 0} chars`);
-	if (expanded) line += `\n${theme.fg("dim", details?.url ?? "")}`;
 	text.setText(line);
 	return text;
 }

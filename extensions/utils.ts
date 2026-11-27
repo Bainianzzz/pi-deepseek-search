@@ -1,5 +1,5 @@
 /**
- * API plumbing and text formatting for the DeepSeek Search / Fetch tools.
+ * API plumbing and text formatting for the DeepSeek Search tool.
  * TUI renderers live in ./render.ts.
  */
 
@@ -112,7 +112,7 @@ function describeHttpError(status: number, body: string): string {
 }
 
 export async function callApi<T>(
-	endpoint: "search" | "fetch",
+	endpoint: "search",
 	body: Record<string, unknown>,
 	signal?: AbortSignal,
 ): Promise<T> {
