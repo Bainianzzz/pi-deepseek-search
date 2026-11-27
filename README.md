@@ -1,6 +1,6 @@
 # pi-deepseek-search
 
-[![npm version](https://img.shields.io/npm/v/%40bainianzzz%2Fpi-deepseek-search)](https://www.npmjs.com/package/@bainianzzz/pi-deepseek-search) [![pi package](https://img.shields.io/badge/pi-package-blueviolet)](https://pi.dev/packages/@bainianzzz/pi-deepseek-search)
+[![npm version](https://img.shields.io/npm/v/%40bainianzzz%2Fpi-deepseek-search)](https://www.npmjs.com/package/@bainianzzz/pi-deepseek-search) [![npm downloads](https://img.shields.io/npm/dm/%40bainianzzz%2Fpi-deepseek-search)](https://www.npmjs.com/package/@bainianzzz/pi-deepseek-search) [![pi package](https://img.shields.io/badge/pi-package-blueviolet)](https://pi.dev/packages/@bainianzzz/pi-deepseek-search)
 
 [中文](./README.zh.md) | **English**
 
