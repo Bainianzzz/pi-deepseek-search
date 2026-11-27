@@ -2,12 +2,11 @@
 
 **中文** | [English](./README.en.md)
 
-一个 [Pi](https://pi.dev) 扩展，基于 [DeepSeek Search / Fetch API](https://api-docs.deepseek.com/zh-cn/guides/search) 提供两个联网工具：
+一个 [Pi](https://pi.dev) 扩展，基于 [DeepSeek Search API](https://api-docs.deepseek.com/zh-cn/guides/search) 提供联网搜索工具：
 
 - **`search`** —— 联网搜索，返回排序后的结果（标题 / 链接 / 站点 / 日期 / 摘要），可选返回网页正文。
-- **`fetch`** —— 抓取单个 URL，返回标题和正文的 Markdown。
 
-两个工具都带自定义 TUI 渲染（紧凑结果列表，`ctrl+o` 展开详情）。
+工具带自定义 TUI 渲染（紧凑结果列表，`ctrl+o` 展开详情）。
 
 ## 安装
 
@@ -36,13 +35,12 @@ API Key 在每次调用时解析，优先级从高到低：
 | 工具 | URL |
 |---|---|
 | `search` | `POST https://api.deepseek.com/v1/tools/search` |
-| `fetch` | `POST https://api.deepseek.com/v1/tools/fetch` |
 
 > `models.json` 会从 `$PI_CODING_AGENT_DIR`（默认 `~/.pi/agent`）和当前目录下的 `./.pi/models.json` 读取。
 
 ## 工具说明
 
-`search` 和 `fetch` 的参数、搜索语法、返回字段与错误码，见官方文档：
+`search` 的参数、搜索语法、返回字段与错误码，见官方文档：
 
 - 中文：https://api-docs.deepseek.com/zh-cn/guides/search
 - English：https://api-docs.deepseek.com/guides/search
@@ -50,26 +48,26 @@ API Key 在每次调用时解析，优先级从高到低：
 ## 行为说明
 
 - 对 `408 / 429 / 5xx` 自动重试，指数退避，最多 3 次，并支持工具级取消（abort）。
-- HTTP 错误会映射为可读信息（`402 余额不足`、`403 被安全策略拒绝抓取` 等）。
+- HTTP 错误会映射为可读信息（`402 余额不足`、`429 触发限流` 等）。
 - 每次调用都会重新读取 API Key，修改环境变量或 `models.json` 后无需重启。
-- 请求地址固定为官方 Endpoint（`https://api.deepseek.com/v1/tools/{search,fetch}`），不提供 base URL 覆盖。
+- 请求地址固定为官方 Endpoint（`https://api.deepseek.com/v1/tools/search`），不提供 base URL 覆盖。
 
-### 已知限制：`fetch` 抓取部分境外/反爬站点返回 404
+### 为什么不集成 fetch 服务
 
-`fetch` 的抓取由 DeepSeek 服务端完成，对境外站点和反爬站点经常失败，返回同一个报文：
+DeepSeek 还提供 `fetch` 接口（抓取单个 URL 的正文），但本扩展不集成它：抓取由 DeepSeek 服务端完成，经常受防火墙影响导致工具报错 404：
 
-```json
-{ "error": { "message": "failed to fetch URL", "type": "not_found_error" } }   // HTTP 404
+```
+DeepSeek API HTTP 404 (no usable page content could be retrieved): failed to fetch URL
 ```
 
-这是服务端的判定，不是本扩展的问题：404 是一个兜底码，页面不存在、站点拒绝访问、内容类型不支持、正文提取为空都返回同一句 `failed to fetch URL`，无法区分。
+404 是一个兜底码，页面不存在、站点拒绝访问、内容类型不支持、正文提取为空都返回同一句 `failed to fetch URL`，无法区分。
 
 ## 目录结构
 
 ```
 pi-deepseek-search/
 ├── extensions/
-│   ├── index.ts             # 扩展本体（注册 search / fetch 工具）
+│   ├── index.ts             # 扩展本体（注册 search 工具）
 │   ├── utils.ts             # API 调用、结果格式化
 │   ├── render.ts            # TUI 渲染组件
 │   └── types.ts             # 共享类型（无本地依赖）

@@ -1,7 +1,7 @@
 {
   "name": "@bainianzzz/pi-deepseek-search",
   "version": "0.1.1",
-  "description": "Pi extension that adds DeepSeek-backed web search and fetch tools",
+  "description": "Pi extension that adds a DeepSeek-backed web search tool",
   "license": "MIT",
   "homepage": "https://github.com/Bainianzzz/pi-deepseek-search",
   "repository": {
@@ -18,7 +18,6 @@
     "deepseek",
     "ds-search",
     "web-search",
-    "fetch",
     "agent"
   ],
   "files": [

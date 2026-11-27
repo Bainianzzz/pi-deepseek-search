@@ -2,13 +2,12 @@
 
 [中文](./README.md) | **English**
 
-A [Pi](https://pi.dev) extension that adds two web tools powered by the
-[DeepSeek Search / Fetch API](https://api-docs.deepseek.com/guides/search):
+A [Pi](https://pi.dev) extension that adds a web search tool powered by the
+[DeepSeek Search API](https://api-docs.deepseek.com/guides/search):
 
 - **`search`** — query the live web, returns ranked results (title / url / site / date / summary), with optional full page content.
-- **`fetch`** — fetch a single URL and return its title plus main content as Markdown.
 
-Both tools ship with a custom TUI renderer (compact result list, `ctrl+o` to expand).
+The tool ships with a custom TUI renderer (compact result list, `ctrl+o` to expand).
 
 ## Install
 
@@ -37,13 +36,12 @@ Request URLs are fixed to the official endpoints and are not configurable:
 | tool | URL |
 |---|---|
 | `search` | `POST https://api.deepseek.com/v1/tools/search` |
-| `fetch` | `POST https://api.deepseek.com/v1/tools/fetch` |
 
 > `models.json` is read from `$PI_CODING_AGENT_DIR` (default `~/.pi/agent`) and from `./.pi/models.json`.
 
 ## Tools
 
-Parameters, search operators, response fields and error codes for `search` and `fetch` are documented upstream:
+Parameters, search operators, response fields and error codes for `search` are documented upstream:
 
 - English: https://api-docs.deepseek.com/guides/search
 - 中文: https://api-docs.deepseek.com/zh-cn/guides/search
@@ -51,26 +49,26 @@ Parameters, search operators, response fields and error codes for `search` and `
 ## Behaviour notes
 
 - Retries on `408 / 429 / 5xx` with exponential backoff (3 attempts), abortable via the tool signal.
-- HTTP errors are mapped to readable messages (`402 insufficient balance`, `403 fetch rejected by security policy`, …).
+- HTTP errors are mapped to readable messages (`402 insufficient balance`, `429 rate limit exceeded`, …).
 - The API key is re-read on every call, so changing env vars or `models.json` does not require a reload.
-- Request URLs are pinned to the official endpoints (`https://api.deepseek.com/v1/tools/{search,fetch}`); there is no base URL override.
+- Request URLs are pinned to the official endpoint (`https://api.deepseek.com/v1/tools/search`); there is no base URL override.
 
-### Known limitation: `fetch` returns 404 for some overseas / anti-bot sites
+### Why the fetch service is not integrated
 
-`fetch` runs server-side at DeepSeek, and often fails for overseas or anti-bot sites with one and the same payload:
+DeepSeek also offers a `fetch` endpoint (retrieve the body of a single URL), but this extension does not integrate it: fetching runs server-side at DeepSeek and is often affected by firewalls, making the tool fail with 404:
 
-```json
-{ "error": { "message": "failed to fetch URL", "type": "not_found_error" } }   // HTTP 404
+```
+DeepSeek API HTTP 404 (no usable page content could be retrieved): failed to fetch URL
 ```
 
-This is the service's verdict, not a bug in this extension: 404 is a catch-all — a missing page, a site refusing access, an unsupported content type and a page with no extractable body all return the identical `failed to fetch URL`, and nothing tells you which.
+404 is a catch-all — a missing page, a site refusing access, an unsupported content type and a page with no extractable body all return the identical `failed to fetch URL`, with no way to tell them apart.
 
 ## Package layout
 
 ```
 pi-deepseek-search/
 ├── extensions/
-│   ├── index.ts             # the extension (registers search / fetch)
+│   ├── index.ts             # the extension (registers search)
 │   ├── utils.ts             # API calls and result formatting
 │   ├── render.ts            # TUI renderers
 │   └── types.ts             # shared types (no local imports)
