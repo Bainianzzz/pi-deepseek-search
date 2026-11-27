@@ -1,6 +1,6 @@
 {
   "name": "@bainianzzz/pi-deepseek-search",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Pi extension that adds a DeepSeek-backed web search tool",
   "license": "MIT",
   "homepage": "https://github.com/Bainianzzz/pi-deepseek-search",
@@ -23,7 +23,7 @@
   "files": [
     "extensions",
     "README.md",
-    "README.en.md",
+    "README.zh.md",
     "LICENSE"
   ],
   "pi": {

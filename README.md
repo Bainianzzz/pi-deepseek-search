@@ -1,90 +1,91 @@
 # pi-deepseek-search
 
-**中文** | [English](./README.en.md)
+[中文](./README.zh.md) | **English**
 
-一个 [Pi](https://pi.dev) 扩展，基于 [DeepSeek Search API](https://api-docs.deepseek.com/zh-cn/guides/search) 提供联网搜索工具：
+A [Pi](https://pi.dev) extension that adds a web search tool powered by the
+[DeepSeek Search API](https://api-docs.deepseek.com/guides/search):
 
-- **`search`** —— 联网搜索，返回排序后的结果（标题 / 链接 / 站点 / 日期 / 摘要），可选返回网页正文。
+- **`search`** — query the live web, returns ranked results (title / url / site / date / summary), with optional full page content.
 
-工具带自定义 TUI 渲染（紧凑结果列表，`ctrl+o` 展开详情）。
+The tool ships with a custom TUI renderer (compact result list, `ctrl+o` to expand).
 
-## 安装
+## Install
 
 ```bash
 pi install npm:@bainianzzz/pi-deepseek-search
 ```
 
-也可以从 GitHub 安装（git 源）：
+Or install from GitHub (git source):
 
 ```bash
 pi install git:github.com/Bainianzzz/pi-deepseek-search
 ```
 
-安装后重启 Pi，或执行 `/reload`。
+Then restart Pi (or run `/reload`).
 
-## 配置
+## Configure
 
-API Key 在每次调用时解析，优先级从高到低：
+The API key is resolved on every call, first match wins:
 
 1. `DEEPSEEK_SEARCH_API_KEY`
-2. `DEEPSEEK_API_KEY`（已配好 DeepSeek 模型 provider 时无需任何额外配置）
-3. `models.json` 中任意 `baseUrl` 域名以 `deepseek.com` 结尾的 provider 的 `apiKey`
+2. `DEEPSEEK_API_KEY` (no extra setup needed if a DeepSeek model provider is already configured)
+3. the `apiKey` of any provider in `models.json` whose `baseUrl` host ends with `deepseek.com`
 
-请求地址固定走官方 Endpoint，不可配置：
+Request URLs are fixed to the official endpoints and are not configurable:
 
-| 工具 | URL |
+| tool | URL |
 |---|---|
 | `search` | `POST https://api.deepseek.com/v1/tools/search` |
 
-> `models.json` 会从 `$PI_CODING_AGENT_DIR`（默认 `~/.pi/agent`）和当前目录下的 `./.pi/models.json` 读取。
+> `models.json` is read from `$PI_CODING_AGENT_DIR` (default `~/.pi/agent`) and from `./.pi/models.json`.
 
-## 工具说明
+## Tools
 
-`search` 的参数、搜索语法、返回字段与错误码，见官方文档：
+Parameters, search operators, response fields and error codes for `search` are documented upstream:
 
-- 中文：https://api-docs.deepseek.com/zh-cn/guides/search
-- English：https://api-docs.deepseek.com/guides/search
+- English: https://api-docs.deepseek.com/guides/search
+- 中文: https://api-docs.deepseek.com/zh-cn/guides/search
 
-## 行为说明
+## Behaviour notes
 
-- 对 `408 / 429 / 5xx` 自动重试，指数退避，最多 3 次，并支持工具级取消（abort）。
-- HTTP 错误会映射为可读信息（`402 余额不足`、`429 触发限流` 等）。
-- 每次调用都会重新读取 API Key，修改环境变量或 `models.json` 后无需重启。
-- 请求地址固定为官方 Endpoint（`https://api.deepseek.com/v1/tools/search`），不提供 base URL 覆盖。
+- Retries on `408 / 429 / 5xx` with exponential backoff (3 attempts), abortable via the tool signal.
+- HTTP errors are mapped to readable messages (`402 insufficient balance`, `429 rate limit exceeded`, …).
+- The API key is re-read on every call, so changing env vars or `models.json` does not require a reload.
+- Request URLs are pinned to the official endpoint (`https://api.deepseek.com/v1/tools/search`); there is no base URL override.
 
-### 为什么不集成 fetch 服务
+### Why the fetch service is not integrated
 
-DeepSeek 还提供 `fetch` 接口（抓取单个 URL 的正文），但本扩展不集成它：抓取由 DeepSeek 服务端完成，经常受防火墙影响导致工具报错 404：
+DeepSeek also offers a `fetch` endpoint (retrieve the body of a single URL), but this extension does not integrate it: fetching runs server-side at DeepSeek and is often affected by firewalls, making the tool fail with 404:
 
 ```
 DeepSeek API HTTP 404 (no usable page content could be retrieved): failed to fetch URL
 ```
 
-404 是一个兜底码，页面不存在、站点拒绝访问、内容类型不支持、正文提取为空都返回同一句 `failed to fetch URL`，无法区分。
+404 is a catch-all — a missing page, a site refusing access, an unsupported content type and a page with no extractable body all return the identical `failed to fetch URL`, with no way to tell them apart.
 
-## 目录结构
+## Package layout
 
 ```
 pi-deepseek-search/
 ├── extensions/
-│   ├── index.ts             # 扩展本体（注册 search 工具）
-│   ├── utils.ts             # API 调用、结果格式化
-│   ├── render.ts            # TUI 渲染组件
-│   └── types.ts             # 共享类型（无本地依赖）
+│   ├── index.ts             # the extension (registers search)
+│   ├── utils.ts             # API calls and result formatting
+│   ├── render.ts            # TUI renderers
+│   └── types.ts             # shared types (no local imports)
 ├── package.json             # pi manifest + peerDependencies
 ├── tsconfig.json
 └── LICENSE
 ```
 
-host 提供的包（`@earendil-works/pi-*`、`typebox`）按 Pi 打包规则声明为 `peerDependencies: "*"`，不放进 `dependencies`。
+Host-provided packages (`@earendil-works/pi-*`, `typebox`) are declared as `peerDependencies` with `"*"`, per the Pi packaging rules.
 
-## 开发
+## Development
 
 ```bash
 npm install
 npm run typecheck
 ```
 
-## 许可证
+## License
 
 MIT
