@@ -1,5 +1,7 @@
 # pi-deepseek-search
 
+[![npm version](https://img.shields.io/npm/v/%40bainianzzz%2Fpi-deepseek-search)](https://www.npmjs.com/package/@bainianzzz/pi-deepseek-search) [![pi package](https://img.shields.io/badge/pi-package-blueviolet)](https://pi.dev/packages/@bainianzzz/pi-deepseek-search)
+
 **中文** | [English](./README.md)
 
 一个 [Pi](https://pi.dev) 扩展，基于 [DeepSeek Search API](https://api-docs.deepseek.com/zh-cn/guides/search) 提供联网搜索工具：
